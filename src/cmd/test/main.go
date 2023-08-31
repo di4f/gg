@@ -11,20 +11,34 @@ import (
 	"math/rand"
 )
 
+const (
+	HighestL gx.Layer = -iota
+	DebugL
+	TriangleL
+	PlayerL
+	RectL
+	LowestL
+)
+
 type Player struct {
 	*gx.Sprite
 	MoveSpeed gx.Float
 	ScaleSpeed gx.Float
+	gx.Layer
 }
 
-type Debug struct{}
+type Debug struct{
+	gx.Layer
+}
 
 type Rect struct {
 	*gx.DrawableRectangle
+	gx.Layer
 }
 
 type Tri struct {
 	*gx.DrawablePolygon
+	gx.Layer
 }
 
 func NewTri() *Tri {
@@ -46,12 +60,13 @@ func NewTri() *Tri {
 	}
 	ret.Color = gx.Color{gx.MaxColorV, gx.MaxColorV, 0, gx.MaxColorV}
 	ret.Visible = true
+	ret.Layer = TriangleL
 	
 	return ret
 }
 
 func NewRect() *Rect {
-	return &Rect{&gx.DrawableRectangle{
+	ret := &Rect{&gx.DrawableRectangle{
 			Rectangle: gx.Rectangle{
 				Transform: gx.Transform{
 					S: gx.Vector{
@@ -76,7 +91,11 @@ func NewRect() *Rect {
 					nil,
 				},
 			},*/
-	}}
+	},
+		RectL,
+	}
+
+	return ret
 }
 
 func (r *Rect) Update(e *gx.Engine) error {
@@ -110,6 +129,7 @@ func NewPlayer() *Player {
 	}
 	
 	ret.Images[0] = playerImg
+	ret.Layer = PlayerL
 	
 	return ret
 }
@@ -206,6 +226,12 @@ func (p *Player) Update(e *gx.Engine) error {
 		}
 	case ebiten.Key0 :
 		e.Del(p)
+	case ebiten.KeyB :
+		if p.Layer != PlayerL {
+			p.Layer = PlayerL
+		} else {
+			p.Layer = HighestL
+		}
 	}}
 
 	return nil
@@ -251,10 +277,11 @@ func main() {
 	rect = NewRect()
 	tri = NewTri()
 	
-	e.Add(1, &Debug{})
-	e.Add(0, player)
-	e.Add(-1, rect)
-	e.Add(100, tri)
+	e.Add(&Debug{})
+	e.Add(player)
+	e.Add(rect)
+	e.Add(tri)
+	fmt.Println(rect.GetLayer(), player.GetLayer())
 	
 	e.Run()
 }

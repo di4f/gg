@@ -3,14 +3,19 @@ package gx
 import (
 	"github.com/hajimehoshi/ebiten/v2"
 	"github.com/hajimehoshi/ebiten/v2/inpututil"
-	"github.com/surdeus/godat/src/sparsex"
-	"github.com/surdeus/godat/src/poolx"
+	"github.com/mojosa-software/godat/sparsex"
+	"github.com/mojosa-software/godat/mapx"
 	"fmt"
 	"time"
 )
 
 // The type represents order of drawing.
-type Layer int
+// Higher values are drawn later.
+type Layer float64
+
+func (l Layer) GetLayer() Layer {
+	return l
+}
 
 // Window configuration type.
 type WindowConfig struct {
@@ -27,8 +32,7 @@ type WindowConfig struct {
 // The main structure that represents current state of [game] engine.
 type Engine struct {
 	wcfg *WindowConfig
-	layers *sparsex.Sparse[Layer, *poolx.Pool[Drawer]]
-	updaters *poolx.Pool[Updater]
+	objects *mapx.OrderedMap[Object, struct{}]
 	lastTime time.Time
 	dt Float
 	camera *Camera
@@ -58,81 +62,59 @@ func NewEngine(
 ) *Engine {
 	w := Float(cfg.Width)
 	h := Float(cfg.Height)
-	fmt.Println("res:", w, h)
 	return &Engine{
 		wcfg: cfg,
-		layers: sparsex.New[
-			Layer,
-			*poolx.Pool[Drawer],
-		](true),
 		camera: &Camera{
 			Transform: Transform{
+					// Normal, no distortion.
 					S: Vector{1, 1},
+					// Center.
 					RA: V(w/2, h/2),
 			},
 		},
-		updaters: poolx.New[Updater](),
+		objects: mapx.NewOrdered[Object, struct{}](),
 	}
 }
 
 // Add new object considering what
 // interfaces it implements.
-func (e *Engine) Add(l Layer, b any) {
+func (e *Engine) Add(b any) error {
+	object, _ := b.(Object)
+	if e.objects.Has(object) {
+		return ObjectExistErr
+	}
+	/*o, ok := e.makeObject(b)
+	if !ok {
+		return ObjectNotImplementedErr
+	}*/
+
 	starter, ok := b.(Starter)
 	if ok {
 		starter.Start(e)
 	}
-	
-	updater, ok := b.(Updater)
-	if ok {
-		e.addUpdater(updater)
-	}
 
-	drawer, ok := b.(Drawer)
-	if ok {
-		e.addDrawer(l, drawer)
-	}
+	e.objects.Set(object, struct{}{})
+
+	return nil
 }
 
 // Delete object from Engine.
-func (e *Engine) Del(b any, v ...any) {
+func (e *Engine) Del(b any) error {
+	object, _ := b.(Object)
+	if !e.objects.Has(object) {
+		return ObjectNotExistErr
+	}
+
 	deleter, ok := b.(Deleter)
 	if ok {
-		deleter.Delete(e, v...)
-	}
-	
-	drawer, ok := b.(Drawer)
-	if ok {
-		for layer := range e.layers.Vals() {
-			layer.V.Del(drawer)
-		}
-	}
-	
-	updater, ok := b.(Updater)
-	if ok {
-		e.updaters.Del(updater)
-	}
-	
-}
-
-func (e *Engine) addDrawer(l Layer, d Drawer) {
-	g, ok := e.layers.Get(l)
-	if !ok {
-		layer := poolx.New[Drawer]()
-		e.layers.Set(
-			l,
-			layer,
-		)
-		layer.Append(d)
-	} else {
-		g.Append(d)
+		deleter.Delete(e)
 	}
 
+	e.objects.Del(b)
+
+	return nil
 }
 
-func (e *Engine) addUpdater(b Updater) {
-	e.updaters.Append(b)
-}
 
 func (e *engine) Update() error {
 	var err error
@@ -142,8 +124,12 @@ func (e *engine) Update() error {
 		AppendPressedKeys(e.keys[:0])
 
 	e.dt = time.Since(e.lastTime).Seconds()
-	for p := range eng.updaters.Range() {
-		err = p.V.Update(eng)
+	for object := range e.objects.KeyChan() {
+		updater, ok := object.(Updater)
+		if !ok {
+			continue
+		}
+		err = updater.Update(eng)
 		if err != nil {
 			return err
 		}
@@ -155,13 +141,28 @@ func (e *engine) Update() error {
 
 func (e *engine) Draw(i *ebiten.Image) {
 	eng := (*Engine)(e)
-	for p := range e.layers.Vals() {
-		for pj := range p.V.Range() {
-			visibler, ok := pj.V.(Visibler)
-			if ok && !visibler.IsVisible() {
-				continue
-			}
-			pj.V.Draw(eng, i)
+	layers := sparsex.New[Layer, []Drawer]()
+	for object := range eng.objects.KeyChan() {
+		drawer, ok := object.(Drawer)
+		if !ok {
+			continue
+		}
+
+		l := drawer.GetLayer()
+		layer, ok := layers.Get(l)
+		if !ok {
+			layers.Set(l, []Drawer{drawer})
+			continue
+		}
+
+		layers.Set(l, append(layer, drawer))
+	}
+
+	// Drawing sorted layers.
+	layers.Sort()
+	for layer := range layers.Chan() {
+		for _, drawer := range layer {
+			drawer.Draw(eng, i)
 		}
 	}
 }
@@ -187,6 +188,7 @@ func (e *Engine) Run() error {
 	ebiten.SetVsyncEnabled(e.wcfg.VSync)
 
 	e.lastTime = time.Now()
+	fmt.Println(e.objects)
 	return ebiten.RunGame((*engine)(e))
 }
 

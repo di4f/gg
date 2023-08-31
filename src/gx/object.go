@@ -6,7 +6,7 @@ package gx
 // the OnUpdate.
 // The v value will be get from Add function.
 type Starter interface {
-	Start(*Engine, ...any)
+	Start(*Engine)
 }
 
 // Implementing the interface type
@@ -22,4 +22,27 @@ type Updater interface {
 type Deleter interface {
 	Delete(*Engine, ...any)
 }
+
+type Visibility struct {
+	Visible bool
+}
+func (v Visibility) IsVisible() bool {
+	return v.Visible
+}
+
+type Colority struct {
+	Color Color
+}
+
+// The interface describes anything that can be
+// drawn. It will be drew corresponding to
+// the layers order.
+type Drawer interface {
+	Draw(*Engine, *Image)
+	GetLayer() Layer
+	IsVisible() bool
+}
+
+// The type represents everything that can work inside engine.
+type Object any
 

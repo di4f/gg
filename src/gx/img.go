@@ -16,32 +16,11 @@ type Color struct {
 	R, G, B, A ColorV
 }
 
-type Colority struct {
-	Color Color
-}
-
-type Visibility struct {
-	Visible bool
-}
-
-// The interface describes anything that can be
-// drawn. It will be drew corresponding to
-// the layers order.
-type Drawer interface {
-	Draw(*Engine, *Image)
-}
-
-type Visibler interface {
-	IsVisible() bool
-}
 
 const (
 	MaxColorV = math.MaxUint32
 )
 
-func (v Visibility) IsVisible() bool {
-	return v.Visible
-}
 
 func LoadImage(input io.Reader) (*Image, error) {
 	img, _, err := image.Decode(input)
