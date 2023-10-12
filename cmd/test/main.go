@@ -1,7 +1,7 @@
 package main
 
 import (
-	"github.com/surdeus/gox/src/gx"
+	"github.com/surdeus/gox/gx"
 	"github.com/hajimehoshi/ebiten/v2/examples/resources/images"
 	"github.com/hajimehoshi/ebiten/v2"
 	"bytes"
