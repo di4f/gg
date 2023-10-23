@@ -1,4 +1,4 @@
-module github.com/surdeus/gox
+module github.com/reklesio/gg
 
 go 1.20
 

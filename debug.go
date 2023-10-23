@@ -1,4 +1,4 @@
-package gx
+package gg
 
 import (
 	"github.com/hajimehoshi/ebiten/v2/ebitenutil"

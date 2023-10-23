@@ -1,4 +1,4 @@
-package gx
+package gg
 
 import (
 	"math"

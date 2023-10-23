@@ -1,4 +1,4 @@
-package gx
+package gg
 
 // Implementing the interface type
 // will call the function OnStart

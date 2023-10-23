@@ -1,4 +1,4 @@
-package gx
+package gg
 
 // The type represents math ray.
 type Ray struct {

@@ -1,4 +1,4 @@
-package gx
+package gg
 
 // Implements the camera component
 // for the main window.

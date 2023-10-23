@@ -1,4 +1,4 @@
-package gx
+package gg
 
 // The structure represents elipses.
 type Elipse struct {

@@ -1,7 +1,7 @@
 package main
 
 import (
-	"github.com/surdeus/gox/src/gx"
+	"github.com/reklesio/gg/src/gx"
 	"fmt"
 )
 
@@ -13,10 +13,7 @@ func main() {
 		gx.Vertex{30, 40},
 		gx.Vertex{40, 30},
 	}
-	
+
 	fmt.Println("barycenter:", p.Barycenter())
 	fmt.Println("edges:", p.Edges())
 }
-
-
-
