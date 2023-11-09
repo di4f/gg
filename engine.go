@@ -3,8 +3,8 @@ package gg
 import (
 	"github.com/hajimehoshi/ebiten/v2"
 	"github.com/hajimehoshi/ebiten/v2/inpututil"
-	"github.com/mojosa-software/godat/sparsex"
-	"github.com/mojosa-software/godat/mapx"
+	"github.com/reklesio/gods/maps"
+	"github.com/reklesio/gods"
 	"fmt"
 	"time"
 )
@@ -32,7 +32,7 @@ type WindowConfig struct {
 // The main structure that represents current state of [game] engine.
 type Engine struct {
 	wcfg *WindowConfig
-	objects *mapx.OrderedMap[Object, struct{}]
+	objects maps.Ordered[Object, struct{}]
 	lastTime time.Time
 	dt Float
 	camera *Camera
