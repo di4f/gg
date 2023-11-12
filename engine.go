@@ -3,8 +3,7 @@ package gg
 import (
 	"github.com/hajimehoshi/ebiten/v2"
 	"github.com/hajimehoshi/ebiten/v2/inpututil"
-	"github.com/reklesio/gods/maps"
-	"github.com/reklesio/gods"
+	"github.com/omnipunk/gods/maps"
 	"fmt"
 	"time"
 )
@@ -32,7 +31,7 @@ type WindowConfig struct {
 // The main structure that represents current state of [game] engine.
 type Engine struct {
 	wcfg *WindowConfig
-	objects maps.Ordered[Object, struct{}]
+	objects maps.Map[Object, struct{}]
 	lastTime time.Time
 	dt Float
 	camera *Camera
@@ -72,7 +71,7 @@ func NewEngine(
 					RA: V(w/2, h/2),
 			},
 		},
-		objects: mapx.NewOrdered[Object, struct{}](),
+		objects: maps.NewOrdered[Object, struct{}](),
 	}
 }
 
@@ -141,7 +140,7 @@ func (e *engine) Update() error {
 
 func (e *engine) Draw(i *ebiten.Image) {
 	eng := (*Engine)(e)
-	layers := sparsex.New[Layer, []Drawer]()
+	m := map[Layer][]Drawer{}
 	for object := range eng.objects.KeyChan() {
 		drawer, ok := object.(Drawer)
 		if !ok {
@@ -149,17 +148,18 @@ func (e *engine) Draw(i *ebiten.Image) {
 		}
 
 		l := drawer.GetLayer()
-		layer, ok := layers.Get(l)
+		layer, ok := m[l]
+		// Create new if has no the layer
 		if !ok {
-			layers.Set(l, []Drawer{drawer})
+			m[l] = []Drawer{drawer}
 			continue
 		}
 
-		layers.Set(l, append(layer, drawer))
+		m[l] = append(layer, drawer)
 	}
 
-	// Drawing sorted layers.
-	layers.Sort()
+	// Drawing layers.
+	layers := maps.NewSparse[Layer, []Drawer](nil, m)
 	for layer := range layers.Chan() {
 		for _, drawer := range layer {
 			drawer.Draw(eng, i)

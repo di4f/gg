@@ -1,7 +1,7 @@
 package main
 
 import (
-	"github.com/reklesio/gg"
+	"github.com/omnipunk/gg"
 	"github.com/hajimehoshi/ebiten/v2/examples/resources/images"
 	"github.com/hajimehoshi/ebiten/v2"
 	"bytes"
