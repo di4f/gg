@@ -184,43 +184,43 @@ func (p *Player) Update(e *gg.Engine) error {
 		case ebiten.KeyT:
 			c.R -= gg.Pi * p.ScaleSpeed * dt
 		case ebiten.KeyRightBracket:
-			if e.KeyIsPressed(ebiten.KeyShift) {
+			if e.IsPressed(ebiten.KeyShift) {
 				p.R -= gg.Pi * 0.3 * dt
 			} else {
 				p.R += gg.Pi * 0.3 * dt
 			}
 		case ebiten.KeyF:
-			if e.KeyIsPressed(ebiten.KeyShift) {
+			if e.IsPressed(ebiten.KeyShift) {
 				c.S.X -= gg.Pi * p.ScaleSpeed * dt
 			} else {
 				c.S.X += gg.Pi * p.ScaleSpeed * dt
 			}
 		case ebiten.KeyG:
-			if e.KeyIsPressed(ebiten.KeyShift) {
+			if e.IsPressed(ebiten.KeyShift) {
 				c.S.Y -= gg.Pi * p.ScaleSpeed * dt
 			} else {
 				c.S.Y += gg.Pi * p.ScaleSpeed * dt
 			}
 		case ebiten.KeyZ:
-			if e.KeyIsPressed(ebiten.KeyShift) {
+			if e.IsPressed(ebiten.KeyShift) {
 				c.RA.X -= gg.Pi * p.MoveSpeed * dt
 			} else {
 				c.RA.X += gg.Pi * p.MoveSpeed * dt
 			}
 		case ebiten.KeyX:
-			if e.KeyIsPressed(ebiten.KeyShift) {
+			if e.IsPressed(ebiten.KeyShift) {
 				c.RA.Y -= gg.Pi * p.MoveSpeed * dt
 			} else {
 				c.RA.Y += gg.Pi * p.MoveSpeed * dt
 			}
 		case ebiten.KeyV:
-			if e.KeyIsPressed(ebiten.KeyShift) {
+			if e.IsPressed(ebiten.KeyShift) {
 				tri.R -= gg.Pi * 0.3 * dt
 			} else {
 				tri.R += gg.Pi * 0.3 * dt
 			}
 		case ebiten.KeyLeftBracket:
-			if e.KeyIsPressed(ebiten.KeyShift) {
+			if e.IsPressed(ebiten.KeyShift) {
 				rect.R -= gg.Pi * 0.3 * dt
 			} else {
 				rect.R += gg.Pi * 0.3 * dt
@@ -228,6 +228,18 @@ func (p *Player) Update(e *gg.Engine) error {
 		case ebiten.Key0:
 			e.Del(p)
 		case ebiten.KeyB:
+		}
+	}
+
+	return nil
+}
+
+func (p *Player) Event(e *gg.Engine, ev any) {
+	fmt.Println("event:", ev)
+	switch ec := ev.(type) {
+	case *gg.KeyDown:
+		switch {
+		case ec.Key == gg.KeyB :
 			if p.Layer != PlayerL {
 				p.Layer = PlayerL
 			} else {
@@ -235,8 +247,6 @@ func (p *Player) Update(e *gg.Engine) error {
 			}
 		}
 	}
-
-	return nil
 }
 
 func (d *Debug) Draw(

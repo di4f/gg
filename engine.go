@@ -35,7 +35,8 @@ type Engine struct {
 	lastTime time.Time
 	dt Float
 	camera *Camera
-	keys []Key
+	keys, prevKeys []Key
+	outerEvents, handleEvents EventChan
 }
 
 type engine Engine
@@ -72,7 +73,13 @@ func NewEngine(
 			},
 		},
 		objects: maps.NewOrdered[Object, struct{}](),
+		outerEvents: make(EventChan),
+		handleEvents: make(EventChan),
 	}
+}
+
+func (e *Engine) EventInput() EventChan {
+	return e.outerEvents
 }
 
 // Add new object considering what
@@ -119,11 +126,35 @@ func (e *engine) Update() error {
 	var err error
 	eng := (*Engine)(e)
 
+	e.prevKeys = e.keys
 	e.keys = inpututil.
 		AppendPressedKeys(e.keys[:0])
 
+	events := []any{}
+
+	diff := keyDiff(e.prevKeys, e.keys)
+	for _, key := range diff {
+		var event any
+		if eng.IsPressed(key) {
+			event = &KeyDown{
+				Key: key,
+			}
+		} else {
+			event = &KeyUp{
+				Key: key,
+			}
+		}
+		events = append(events, event)
+	}
+
 	e.dt = time.Since(e.lastTime).Seconds()
 	for object := range e.objects.KeyChan() {
+		eventer, ok := object.(Eventer)
+		if ok {
+			for _, event := range events {
+				eventer.Event(eng, event)
+			}
+		}
 		updater, ok := object.(Updater)
 		if !ok {
 			continue
