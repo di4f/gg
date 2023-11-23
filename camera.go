@@ -24,3 +24,10 @@ func (c *Camera)RealMatrix(
 	return *g
 }
 
+func (c *Camera) AbsMatrix(
+	e *Engine,
+) Matrix {
+	m := c.RealMatrix(e)
+	m.Invert()
+	return m
+}

@@ -1,7 +1,7 @@
 package gg
 
 import (
-	"github.com/hajimehoshi/ebiten/v2"
+	//"github.com/hajimehoshi/ebiten/v2"
 )
 
 type Eventer interface {
@@ -38,7 +38,6 @@ type KeyUp struct {
 }
 
 
-type MouseButton = ebiten.MouseButton
 type MouseButtonDown struct {
 	MouseButton
 	P Vector

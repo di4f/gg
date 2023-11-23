@@ -263,6 +263,9 @@ func (d *Debug) Draw(
 		keyStrs = append(keyStrs, "THIS IS SHIT")
 	}
 
+	keyStrs = append(keyStrs, fmt.Sprintf("%v", e.CursorPosition()))
+	keyStrs = append(keyStrs, fmt.Sprintf("%v", e.AbsCursorPosition()))
+
 	e.DebugPrint(i,
 		strings.Join(keyStrs, ", "))
 
