@@ -142,7 +142,6 @@ func (what LineSegments) Cross(with LineSegments) ([][2]int, Points) {
 		for j := range with {
 			p, cross := LinersCross(what[i], with[j])
 			if cross {
-				fmt.Println("in")
 				points = append(points, p)
 				indexes = append(indexes, [2]int{i, j})
 			}

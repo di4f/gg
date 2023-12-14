@@ -4,7 +4,7 @@ package gg
 // the engine to work faster about
 // collisions because it first checks
 // if the the bigger collider that
-// contain more complicated structure
+// contains more complicated (accurate) structure
 // do collide.
 type ColliderSimplifier interface {
 	ColliderSimplify() Triangle
@@ -14,6 +14,10 @@ type ColliderSimplifier interface {
 // information on collisions.
 type Collision struct {
 	Current, With any
+}
+
+type PointContainer interface {
+	ContainsPoint(Point) bool
 }
 
 // Implementing the interface lets the engine

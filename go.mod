@@ -1,4 +1,4 @@
-module github.com/omnipunk/gg
+module github.com/di4f/gg
 
 go 1.21
 

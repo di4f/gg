@@ -1,7 +1,7 @@
 package main
 
 import (
-	"github.com/omnipunk/gg"
+	"github.com/di4f/gg"
 	"github.com/hajimehoshi/ebiten/v2/examples/resources/images"
 	"github.com/hajimehoshi/ebiten/v2"
 	"bytes"
@@ -239,7 +239,7 @@ func (p *Player) Event(e *gg.Engine, ev any) {
 	switch ec := ev.(type) {
 	case *gg.KeyDown:
 		switch {
-		case ec.Key == gg.KeyB :
+		case ec.Key == gg.KeyB:
 			if p.Layer != PlayerL {
 				p.Layer = PlayerL
 			} else {
@@ -256,6 +256,10 @@ func (d *Debug) Draw(
 	keyStrs := []string{}
 	for _, k := range e.Keys() {
 		keyStrs = append(keyStrs, k.String())
+	}
+
+	if rectMove.ContainsPoint(e.AbsCursorPosition()) {
+		keyStrs = append(keyStrs, "contains cursor")
 	}
 
 	if rectMove.Vertices().Contained(rect).Len() > 0 ||
