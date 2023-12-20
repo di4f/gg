@@ -10,10 +10,7 @@ type Sprite struct {
 	Floating, Visible bool
 }
 
-func (s *Sprite) Draw(
-	e *Engine,
-	i *Image,
-) {
+func (s *Sprite) Draw(c *Context) {
 	// Nothing to draw.
 	if s.Images[0] == nil {
 		return
@@ -23,16 +20,14 @@ func (s *Sprite) Draw(
 	m := &Matrix{}
 	m.Concat(t.Matrix())
 	if !s.Floating {
-		m.Concat(e.Camera().RealMatrix(
-			e,
-		))
+		m.Concat(c.Camera().RealMatrix())
 	}
 
 	// Drawing without shader.
 	if s.Shader == nil {
 		opts := &ebiten.DrawImageOptions{}
 		opts.GeoM = *m
-		i.DrawImage(s.Images[0], opts)
+		c.DrawImage(s.Images[0], opts)
 		return
 	}
 	
@@ -43,7 +38,7 @@ func (s *Sprite) Draw(
 		Uniforms: s.Uniforms,
 		GeoM: *m,
 	}
-	i.DrawRectShader(w, h, s.Shader, opts)
+	c.DrawRectShader(w, h, s.Shader, opts)
 }
 
 // Check is sprite is visible.

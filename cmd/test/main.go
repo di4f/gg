@@ -11,6 +11,8 @@ import (
 	"math/rand"
 )
 
+type Context = gg.Context
+
 const (
 	HighestL gg.Layer = -iota
 	DebugL
@@ -28,6 +30,7 @@ type Player struct {
 }
 
 type Debug struct {
+	gg.Visibility
 	gg.Layer
 }
 
@@ -98,9 +101,13 @@ func NewRect() *Rect {
 	return ret
 }
 
-func (r *Rect) Update(e *gg.Engine) error {
+func (r *Rect) Update(c *Context) error {
 	//r.R += 0.3 * e.DT()
+	r.P = c.AbsCursorPosition()
 	return nil
+}
+
+func (r *Rect) Event(c *Context) {
 }
 
 var (
@@ -134,8 +141,8 @@ func NewPlayer() *Player {
 	return ret
 }
 
-func (p *Player) Draw(e *gg.Engine, i *gg.Image) {
-	p.Sprite.Draw(e, i)
+func (p *Player) Draw(c *Context) {
+	p.Sprite.Draw(c)
 	t := p.Transform
 	t.S.X *= 4.
 	t.S.Y *= 4.
@@ -146,31 +153,31 @@ func (p *Player) Draw(e *gg.Engine, i *gg.Image) {
 		Rectangle: rectMove,
 		Color:     gg.Color{0, 0, gg.MaxColorV, gg.MaxColorV},
 	}
-	r.Draw(e, i)
+	r.Draw(c)
 }
 
-func (p *Player) Start(e *gg.Engine, v ...any) {
+func (p *Player) Start(c *Context) {
 	fmt.Println("starting")
-	c := e.Camera()
-	c.RA = gg.V(360, 240)
+	cam := c.Camera()
+	cam.RA = gg.V(360, 240)
 }
 
-func (p *Player) Update(e *gg.Engine) error {
-	dt := e.DT()
-	c := e.Camera()
-	keys := e.Keys()
+func (p *Player) Update(c *Context) error {
+	dt := c.DT()
+	cam := c.Camera()
+	keys := c.Keys()
 
 	p.Uniforms["Random"] = any(rand.Float32())
 	for _, v := range keys {
 		switch v {
 		case ebiten.KeyArrowUp:
-			c.P.Y += p.MoveSpeed * dt
+			cam.P.Y += p.MoveSpeed * dt
 		case ebiten.KeyArrowLeft:
-			c.P.X -= p.MoveSpeed * dt
+			cam.P.X -= p.MoveSpeed * dt
 		case ebiten.KeyArrowDown:
-			c.P.Y -= p.MoveSpeed * dt
+			cam.P.Y -= p.MoveSpeed * dt
 		case ebiten.KeyArrowRight:
-			c.P.X += p.MoveSpeed * dt
+			cam.P.X += p.MoveSpeed * dt
 		case ebiten.KeyW:
 			p.P.Y += p.MoveSpeed * dt
 		case ebiten.KeyA:
@@ -180,61 +187,61 @@ func (p *Player) Update(e *gg.Engine) error {
 		case ebiten.KeyD:
 			p.P.X += p.MoveSpeed * dt
 		case ebiten.KeyR:
-			c.R += gg.Pi * p.ScaleSpeed * dt
+			cam.R += gg.Pi * p.ScaleSpeed * dt
 		case ebiten.KeyT:
-			c.R -= gg.Pi * p.ScaleSpeed * dt
+			cam.R -= gg.Pi * p.ScaleSpeed * dt
 		case ebiten.KeyRightBracket:
-			if e.IsPressed(ebiten.KeyShift) {
+			if c.IsPressed(gg.KeyShift) {
 				p.R -= gg.Pi * 0.3 * dt
 			} else {
 				p.R += gg.Pi * 0.3 * dt
 			}
-		case ebiten.KeyF:
-			if e.IsPressed(ebiten.KeyShift) {
-				c.S.X -= gg.Pi * p.ScaleSpeed * dt
+		case gg.KeyF:
+			if c.IsPressed(ebiten.KeyShift) {
+				cam.S.X -= gg.Pi * p.ScaleSpeed * dt
 			} else {
-				c.S.X += gg.Pi * p.ScaleSpeed * dt
+				cam.S.X += gg.Pi * p.ScaleSpeed * dt
 			}
-		case ebiten.KeyG:
-			if e.IsPressed(ebiten.KeyShift) {
-				c.S.Y -= gg.Pi * p.ScaleSpeed * dt
+		case gg.KeyG:
+			if c.IsPressed(ebiten.KeyShift) {
+				cam.S.Y -= gg.Pi * p.ScaleSpeed * dt
 			} else {
-				c.S.Y += gg.Pi * p.ScaleSpeed * dt
+				cam.S.Y += gg.Pi * p.ScaleSpeed * dt
 			}
-		case ebiten.KeyZ:
-			if e.IsPressed(ebiten.KeyShift) {
-				c.RA.X -= gg.Pi * p.MoveSpeed * dt
+		case gg.KeyZ:
+			if c.IsPressed(ebiten.KeyShift) {
+				cam.RA.X -= gg.Pi * p.MoveSpeed * dt
 			} else {
-				c.RA.X += gg.Pi * p.MoveSpeed * dt
+				cam.RA.X += gg.Pi * p.MoveSpeed * dt
 			}
-		case ebiten.KeyX:
-			if e.IsPressed(ebiten.KeyShift) {
-				c.RA.Y -= gg.Pi * p.MoveSpeed * dt
+		case gg.KeyX:
+			if c.IsPressed(ebiten.KeyShift) {
+				cam.RA.Y -= gg.Pi * p.MoveSpeed * dt
 			} else {
-				c.RA.Y += gg.Pi * p.MoveSpeed * dt
+				cam.RA.Y += gg.Pi * p.MoveSpeed * dt
 			}
-		case ebiten.KeyV:
-			if e.IsPressed(ebiten.KeyShift) {
+		case gg.KeyV:
+			if c.IsPressed(ebiten.KeyShift) {
 				tri.R -= gg.Pi * 0.3 * dt
 			} else {
 				tri.R += gg.Pi * 0.3 * dt
 			}
-		case ebiten.KeyLeftBracket:
-			if e.IsPressed(ebiten.KeyShift) {
+		case gg.KeyLeftBracket:
+			if c.IsPressed(ebiten.KeyShift) {
 				rect.R -= gg.Pi * 0.3 * dt
 			} else {
 				rect.R += gg.Pi * 0.3 * dt
 			}
-		case ebiten.Key0:
-			e.Del(p)
-		case ebiten.KeyB:
+		case gg.Key0:
+			c.Del(p)
+		case gg.KeyB:
 		}
 	}
 
 	return nil
 }
 
-func (p *Player) Event(e *gg.Engine, ev any) {
+func (p *Player) Signal(e *gg.Engine, ev any) {
 	fmt.Println("event:", ev)
 	switch ec := ev.(type) {
 	case *gg.KeyDown:
@@ -249,10 +256,8 @@ func (p *Player) Event(e *gg.Engine, ev any) {
 	}
 }
 
-func (d *Debug) Draw(
-	e *gg.Engine,
-	i *gg.Image,
-) {
+func (d *Debug) Draw(c *Context) {
+	e := c.Engine
 	keyStrs := []string{}
 	for _, k := range e.Keys() {
 		keyStrs = append(keyStrs, k.String())
@@ -270,7 +275,7 @@ func (d *Debug) Draw(
 	keyStrs = append(keyStrs, fmt.Sprintf("%v", e.CursorPosition()))
 	keyStrs = append(keyStrs, fmt.Sprintf("%v", e.AbsCursorPosition()))
 
-	e.DebugPrint(i,
+	e.DebugPrint(c.Image,
 		strings.Join(keyStrs, ", "))
 
 }

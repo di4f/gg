@@ -4,10 +4,6 @@ import (
 	//"github.com/hajimehoshi/ebiten/v2"
 )
 
-type Eventer interface {
-	Event(e *Engine, ev any)
-}
-
 func keyDiff(s1, s2 []Key) []Key {
     combinedSlice := append(s1, s2...)
     dm := make(map[Key]int)
@@ -36,7 +32,6 @@ type KeyDown struct {
 type KeyUp struct {
 	Key
 }
-
 
 type MouseButtonDown struct {
 	MouseButton

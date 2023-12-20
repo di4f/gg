@@ -88,11 +88,8 @@ func (ts Triangles) ContainsPoint(p Point) bool {
 	return false
 }
 
-func (r *DrawableTriangles) Draw(
-	e *Engine,
-	i *Image,
-) {
-	m := e.Camera().RealMatrix(e)
+func (r *DrawableTriangles) Draw(c *Context) {
+	m := c.Camera().RealMatrix()
 	cm := &m
 	
 	// Draw solid color if no shader.
@@ -115,7 +112,7 @@ func (r *DrawableTriangles) Draw(
 		img := NewImage(1, 1)
 		img.Set(0, 0, r.Color)
 		
-		i.DrawTriangles(vs, is, img, &r.DrawTrianglesOptions)
+		c.DrawTriangles(vs, is, img, &r.DrawTrianglesOptions)
 		return
 	}
 	

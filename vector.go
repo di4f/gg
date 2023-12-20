@@ -14,10 +14,6 @@ type Point = Vector
 type Vectors []Vector
 type Points []Point
 
-type PointContainer interface {
-	ContainsPoint(Point) bool
-}
-
 func V(x, y Float) Vector {
 	return Vector{x, y}
 }

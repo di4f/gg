@@ -2,7 +2,7 @@ package gg
 
 import (
 	"math"
-	"fmt"
+	//"fmt"
 )
 
 // The type represents mathematical equation of line and line itself.

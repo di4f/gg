@@ -38,15 +38,12 @@ func (p *Polygon) MakeTriangles() Triangles {
 	return ret
 }
 
-func (p *DrawablePolygon) Draw(
-	e *Engine,
-	i *Image,
-) {
+func (p *DrawablePolygon) Draw(c *Context) {
 	(&DrawableTriangles{
 		Visibility: p.Visibility,
 		Colority: p.Colority,
 		ShaderOptions: p.ShaderOptions,
 		Triangles: p.MakeTriangles(),
-	}).Draw(e, i)
+	}).Draw(c)
 }
 

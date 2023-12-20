@@ -73,12 +73,9 @@ func (r *DrawableRectangle) IsVisible() bool {
 	return r.Visible
 }
 
-func (r *DrawableRectangle) Draw(
-	e *Engine,
-	i *Image,
-) {
+func (r *DrawableRectangle) Draw(c *Context) {
 	m := r.Matrix()
-	rm := e.Camera().RealMatrix(e)
+	rm := c.Camera().RealMatrix()
 	m.Concat(rm)
 	// Draw solid color if no shader.
 	if r.Shader == nil {
@@ -89,7 +86,7 @@ func (r *DrawableRectangle) Draw(
 		opts := &ebiten.DrawImageOptions{
 			GeoM: m,
 		}
-		i.DrawImage(img, opts)
+		c.DrawImage(img, opts)
 		return
 	}
 	
@@ -117,6 +114,6 @@ func (r *DrawableRectangle) Draw(
 		Images: r.Images,
 		Uniforms: r.Uniforms,
 	}
-	i.DrawRectShader(w, h, r.Shader, opts)
+	c.DrawRectShader(w, h, r.Shader, opts)
 }
 

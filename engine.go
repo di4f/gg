@@ -96,7 +96,9 @@ func (e *Engine) Add(b any) error {
 
 	starter, ok := b.(Starter)
 	if ok {
-		starter.Start(e)
+		starter.Start(&Context{
+			Engine: e,
+		})
 	}
 
 	e.objects.Set(object, struct{}{})
@@ -113,7 +115,9 @@ func (e *Engine) Del(b any) error {
 
 	deleter, ok := b.(Deleter)
 	if ok {
-		deleter.Delete(e)
+		deleter.Delete(&Context{
+			Engine: e,
+		})
 	}
 
 	e.objects.Del(b)
@@ -152,14 +156,19 @@ func (e *engine) Update() error {
 		eventer, ok := object.(Eventer)
 		if ok {
 			for _, event := range events {
-				eventer.Event(eng, event)
+				eventer.Event(&Context{
+					Engine: eng,
+					Event: event,
+				})
 			}
 		}
 		updater, ok := object.(Updater)
 		if !ok {
 			continue
 		}
-		err = updater.Update(eng)
+		err = updater.Update(&Context{
+			Engine: eng,
+		})
 		if err != nil {
 			return err
 		}
@@ -193,7 +202,10 @@ func (e *engine) Draw(i *ebiten.Image) {
 	layers := maps.NewSparse[Layer, []Drawer](nil, m)
 	for layer := range layers.Chan() {
 		for _, drawer := range layer {
-			drawer.Draw(eng, i)
+			drawer.Draw(&Context{
+				Engine: eng,
+				Image: i,
+			})
 		}
 	}
 }
