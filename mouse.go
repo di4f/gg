@@ -13,7 +13,7 @@ func (e *Engine) CursorPosition() Vector {
 
 func (e *Engine) AbsCursorPosition() Vector {
 	m := &Matrix{}
-	m.Concat(e.Camera().AbsMatrix())
+	m.Concat(e.Camera.AbsMatrix())
 	return e.CursorPosition().Apply(m)
 }
 

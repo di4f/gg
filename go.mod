@@ -5,8 +5,8 @@ go 1.21
 toolchain go1.21.3
 
 require (
+	github.com/di4f/gods v0.0.0-20231214190239-d523423d8d5e
 	github.com/hajimehoshi/ebiten/v2 v2.6.0-alpha.3.0.20230521122940-90562ee84b9b
-	github.com/omnipunk/gods v0.0.0-20231112101528-1f82aa46d746
 )
 
 require (

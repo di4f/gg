@@ -18,6 +18,24 @@ func V(x, y Float) Vector {
 	return Vector{x, y}
 }
 
+func V1(v Float) Vector {
+	return V(v, v)
+}
+
+func (v Vector) Div(o Vector) Vector {
+	return V(
+		v.X / o.X,
+		v.Y / o.Y,
+	)
+}
+
+func (v Vector) Scale(o Vector) Vector {
+	return V(
+		v.X * o.X,
+		v.Y * o.Y,
+	)
+}
+
 func (v Vector) Eq(o Vector) bool {
 	return v.X == o.X && v.Y == o.Y
 }

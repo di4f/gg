@@ -3,8 +3,8 @@ package gg
 import (
 	"github.com/hajimehoshi/ebiten/v2"
 	"github.com/hajimehoshi/ebiten/v2/inpututil"
-	"github.com/omnipunk/gods/maps"
-	"fmt"
+	"github.com/di4f/gods/maps"
+	//"fmt"
 	"time"
 )
 
@@ -18,11 +18,16 @@ func (l Layer) GetLayer() Layer {
 
 // Window configuration type.
 type WindowConfig struct {
+	// The title of the window.
 	Title string
 	
+	// Width and height of the window
+	// in pixels.
 	Width,
 	Height int
 	
+	// Optional settings with
+	// self describing names.
 	FixedSize,
 	Fullscreen,
 	VSync bool
@@ -31,25 +36,29 @@ type WindowConfig struct {
 // The main structure that represents current state of [game] engine.
 type Engine struct {
 	wcfg *WindowConfig
-	objects maps.Map[Object, struct{}]
+
+	// The main holder for objects.
+	// Uses the map structure to quickly
+	// delete and create new objects.
+	Objects maps.Map[Object, struct{}]
+
+	// The main camera to display in window.
+	// If is set to nil then the engine will panic.
+	Camera *Camera
+
+	// The same delta time for all frames
+	// and all objects.
 	lastTime time.Time
 	dt Float
-	camera *Camera
+
+	// Temporary stuff 
 	keys, prevKeys []Key
+	cursorPos, prevCursorPos Vector
+	mouseButtons, prevMouseButtons []MouseButton
 	outerEvents, handleEvents EventChan
 }
 
 type engine Engine
-
-// Return current camera.
-func (e *Engine) Camera() *Camera {
-	return e.camera
-}
-
-// Set new current camera.
-func (e *Engine) SetCamera(c *Camera) {
-	e.camera = c
-}
 
 // Get currently pressed keys.
 func (e *Engine) Keys() []Key {
@@ -60,22 +69,29 @@ func (e *Engine) Keys() []Key {
 func NewEngine(
 	cfg *WindowConfig,
 ) *Engine {
-	w := Float(cfg.Width)
-	h := Float(cfg.Height)
-	return &Engine{
-		wcfg: cfg,
-		camera: &Camera{
-			Transform: Transform{
-					// Normal, no distortion.
-					S: Vector{1, 1},
-					// Center.
-					RA: V(w/2, h/2),
-			},
-		},
-		objects: maps.NewOrdered[Object, struct{}](),
-		outerEvents: make(EventChan),
-		handleEvents: make(EventChan),
-	}
+	/*w := Float(cfg.Width)
+	h := Float(cfg.Height)*/
+
+	ret := &Engine{}
+
+	ret.wcfg = cfg
+	ret.Camera = ret.NewCamera()
+	ret.outerEvents = make(EventChan)
+	ret.handleEvents = make(EventChan)
+	ret.Objects = maps.NewOrdered[Object, struct{}]()
+	return ret
+}
+
+// Get the real window size in the current context.
+func (c *Engine) RealWinSize() Vector {
+	return V(
+		Float(c.wcfg.Width),
+		Float(c.wcfg.Height),
+	)
+}
+
+func (c *Engine) AbsWinSize() Vector {
+	return c.RealWinSize().Div(c.Camera.Scale)
 }
 
 func (e *Engine) EventInput() EventChan {
@@ -86,7 +102,7 @@ func (e *Engine) EventInput() EventChan {
 // interfaces it implements.
 func (e *Engine) Add(b any) error {
 	object, _ := b.(Object)
-	if e.objects.Has(object) {
+	if e.Objects.Has(object) {
 		return ObjectExistErr
 	}
 	/*o, ok := e.makeObject(b)
@@ -101,7 +117,7 @@ func (e *Engine) Add(b any) error {
 		})
 	}
 
-	e.objects.Set(object, struct{}{})
+	e.Objects.Set(object, struct{}{})
 
 	return nil
 }
@@ -109,7 +125,7 @@ func (e *Engine) Add(b any) error {
 // Delete object from Engine.
 func (e *Engine) Del(b any) error {
 	object, _ := b.(Object)
-	if !e.objects.Has(object) {
+	if !e.Objects.Has(object) {
 		return ObjectNotExistErr
 	}
 
@@ -120,14 +136,13 @@ func (e *Engine) Del(b any) error {
 		})
 	}
 
-	e.objects.Del(b)
+	e.Objects.Del(b)
 
 	return nil
 }
 
 
 func (e *engine) Update() error {
-	var err error
 	eng := (*Engine)(e)
 
 	e.prevKeys = e.keys
@@ -152,7 +167,7 @@ func (e *engine) Update() error {
 	}
 
 	e.dt = time.Since(e.lastTime).Seconds()
-	for object := range e.objects.KeyChan() {
+	for object := range e.Objects.KeyChan() {
 		eventer, ok := object.(Eventer)
 		if ok {
 			for _, event := range events {
@@ -166,12 +181,9 @@ func (e *engine) Update() error {
 		if !ok {
 			continue
 		}
-		err = updater.Update(&Context{
+		updater.Update(&Context{
 			Engine: eng,
 		})
-		if err != nil {
-			return err
-		}
 	}
 	e.lastTime = time.Now()
 
@@ -181,7 +193,7 @@ func (e *engine) Update() error {
 func (e *engine) Draw(i *ebiten.Image) {
 	eng := (*Engine)(e)
 	m := map[Layer][]Drawer{}
-	for object := range eng.objects.KeyChan() {
+	for object := range eng.Objects.KeyChan() {
 		drawer, ok := object.(Drawer)
 		if !ok {
 			continue
@@ -208,6 +220,8 @@ func (e *engine) Draw(i *ebiten.Image) {
 			})
 		}
 	}
+	// Empty the buff to generate it again.
+	eng.Camera.buf = nil
 }
 
 func (e *engine) Layout(ow, oh int) (int, int) {
@@ -231,7 +245,7 @@ func (e *Engine) Run() error {
 	ebiten.SetVsyncEnabled(e.wcfg.VSync)
 
 	e.lastTime = time.Now()
-	fmt.Println(e.objects)
+	//fmt.Println(e.Objects)
 	return ebiten.RunGame((*engine)(e))
 }
 

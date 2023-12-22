@@ -9,23 +9,21 @@ import (
 
 // The type describes rectangle geometry.
 type Rectangle struct {
-	// P - position of the rotating center.
-	// Scale represent width and height.
 	Transform
 }
 
 // The type describes rectangle that can be drawn.
 type DrawableRectangle struct {
 	Rectangle
-	ShaderOptions	
+	ShaderOptions
 	
 	// Solid color of the rectangle.
 	// Will be ignored if the Shader
 	// field is not nil.
-	Color Color
+	Colority
 	
 	// Should be draw or not.
-	Visible bool
+	Visibility
 }
 
 // Return points of vertices of the rectangle.
@@ -55,7 +53,6 @@ func (r Rectangle) Triangles() Triangles {
 	p2 := pts[1]
 	p3 := pts[2]
 	p4 := pts[3]
-	//fmt.Println("in:", p1, p2, p3, p4)
 	
 	return Triangles{
 		Triangle{p1, p2, p3},
@@ -75,7 +72,7 @@ func (r *DrawableRectangle) IsVisible() bool {
 
 func (r *DrawableRectangle) Draw(c *Context) {
 	m := r.Matrix()
-	rm := c.Camera().RealMatrix()
+	rm := c.Camera.RealMatrix()
 	m.Concat(rm)
 	// Draw solid color if no shader.
 	if r.Shader == nil {

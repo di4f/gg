@@ -8,23 +8,26 @@ import (
 // The structure represents basic transformation
 // features: positioning, rotating and scaling.
 type Transform struct {
-	// P - absolute phisycal position in engine itself.
-	//
-	// S - scale width and height (X and Y).
-	//
-	// RA - rotate around(relatively of position, not absolute).
-	//
-	// For example RA=Vector{0, 0} will rotate around right up corner
-	// and RA=Vector{.5, .5} will rotate around center.
-	P, S, RA Vector
-	// Rotation angle in radians.
-	R Float
+	// Absolute (if no parent) position and
+	// the scale.
+	Position, Scale Vector
+	// The object rotation in radians.
+	Rotation Float
+	// The not scaled offset vector from upper left corner
+	// which the object should be rotated around.
+	Around Vector
+	// Needs to be implemented.
+	// Makes transform depending on the other one.
+	// Is the root one if Parent == nil
+	Parent *Transform
 }
 
-// Returns empty Transform.
+// Returns empty Transform
+// with standard scaling. (1/1)
 func T() Transform {
 	ret := Transform{
-		S: Vector{1, 1},
+		Scale: Vector{1, 1},
+		Around: V(.5, .5),
 	}
 	return ret
 }
@@ -34,12 +37,12 @@ func (t Transform) ScaledToXY(x, y Float) Transform {
 }
 
 func (t Transform) ScaledToX(x Float) Transform {
-	t.S.X = x
+	t.Scale.X = x
 	return t
 }
 
 func (t Transform) ScaledToY(y Float) Transform {
-	t.S.Y = y
+	t.Scale.Y = y
 	return t
 }
 
@@ -48,10 +51,18 @@ func (t Transform) ScaledToY(y Float) Transform {
 func (t Transform)Matrix() Matrix {
 	g := &Matrix{}
 
-	g.Scale(t.S.X, t.S.Y)
-	g.Translate(-t.RA.X * t.S.X, -t.RA.Y * t.S.Y)
-	g.Rotate(t.R)
-	g.Translate(t.P.X, t.P.Y)
+	// Scale first.
+	g.Scale(t.Scale.X, t.Scale.Y)
+
+	// Then move and rotate.
+	g.Translate(
+		-t.Around.X * t.Scale.X,
+		-t.Around.Y * t.Scale.Y,
+	)
+	g.Rotate(t.Rotation)
+
+	// And finally move to the absolute position.
+	g.Translate(t.Position.X, t.Position.Y)
 
 	return *g
 }

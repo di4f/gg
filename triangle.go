@@ -89,7 +89,7 @@ func (ts Triangles) ContainsPoint(p Point) bool {
 }
 
 func (r *DrawableTriangles) Draw(c *Context) {
-	m := c.Camera().RealMatrix()
+	m := c.Camera.RealMatrix()
 	cm := &m
 	
 	// Draw solid color if no shader.

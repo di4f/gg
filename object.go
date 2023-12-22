@@ -19,7 +19,7 @@ type Starter interface {
 // will call the function on each
 // engine iteration.
 type Updater interface {
-	Update(*Context) error
+	Update(*Context)
 }
 
 // Implementing the interface type

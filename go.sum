@@ -1,3 +1,5 @@
+github.com/di4f/gods v0.0.0-20231214190239-d523423d8d5e h1:LdL9GpXPJikQ7DXQZFf5Zz5h5MYAS9R7itEztnscku8=
+github.com/di4f/gods v0.0.0-20231214190239-d523423d8d5e/go.mod h1:5GbuWHGgBJIIhBiQB/00flvo3k421S8O1XvmrXKWO2U=
 github.com/ebitengine/purego v0.4.0-alpha.4 h1:Y7yIV06Yo5M2BAdD7EVPhfp6LZ0tEcQo5770OhYUVes=
 github.com/ebitengine/purego v0.4.0-alpha.4/go.mod h1:ah1In8AOtksoNK6yk5z1HTJeUkC1Ez4Wk2idgGslMwQ=
 github.com/go-gl/glfw/v3.3/glfw v0.0.0-20221017161538-93cebf72946b h1:GgabKamyOYguHqHjSkDACcgoPIz3w0Dis/zJ1wyHHHU=
@@ -6,8 +8,6 @@ github.com/hajimehoshi/ebiten/v2 v2.6.0-alpha.3.0.20230521122940-90562ee84b9b h1
 github.com/hajimehoshi/ebiten/v2 v2.6.0-alpha.3.0.20230521122940-90562ee84b9b/go.mod h1:+fFI6Ag5YvbX1ivNQD2TxNhpWFDPuxEoew421TTQAxI=
 github.com/jezek/xgb v1.1.0 h1:wnpxJzP1+rkbGclEkmwpVFQWpuE2PUGNUzP8SbfFobk=
 github.com/jezek/xgb v1.1.0/go.mod h1:nrhwO0FX/enq75I7Y7G8iN1ubpSGZEiA3v9e9GyRFlk=
-github.com/omnipunk/gods v0.0.0-20231112101528-1f82aa46d746 h1:3Hqv6OBITqr9SUhCqD9ZZG3xXMrYNDvyCsZK7BF4lTo=
-github.com/omnipunk/gods v0.0.0-20231112101528-1f82aa46d746/go.mod h1:zARHZc37wTaPpL5GVzZd0FK59r8UbPnxodIXWQ59uLk=
 github.com/yuin/goldmark v1.4.13/go.mod h1:6yULJ656Px+3vBD8DxQVa3kxgyrAnzto9xy5taEt/CY=
 golang.org/x/crypto v0.0.0-20190308221718-c2843e01d9a2/go.mod h1:djNgcEr1/C05ACkg1iLfiJU5Ep61QUkGW8qpdssI0+w=
 golang.org/x/crypto v0.0.0-20210921155107-089bfa567519/go.mod h1:GvvjBRRGRdwPK5ydBHafDWAxML/pGHZbMvKqRZ5+Abc=

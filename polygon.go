@@ -13,6 +13,10 @@ type Polygon struct {
 	Triangles
 }
 
+func (p *Polygon) ContainsPoint(pnt Point) bool {
+	return p.MakeTriangles().ContainsPoint(pnt)
+}
+
 // Polygon that can be drawn.
 type DrawablePolygon struct {
 	Polygon

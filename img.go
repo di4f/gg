@@ -16,11 +16,20 @@ type Color struct {
 	R, G, B, A ColorV
 }
 
-
 const (
 	MaxColorV = math.MaxUint32
 )
 
+// The wrapper to make RGBA color via
+// values from 0 to 1 (no value at all and the max value).
+func Rgba(r, g, b, a Float) Color {
+	return Color {
+		ColorV(r*MaxColorV),
+		ColorV(g*MaxColorV),
+		ColorV(b*MaxColorV),
+		ColorV(a*MaxColorV),
+	}
+}
 
 func LoadImage(input io.Reader) (*Image, error) {
 	img, _, err := image.Decode(input)

@@ -2,12 +2,14 @@ package gg
 
 import (
 	"github.com/hajimehoshi/ebiten/v2"
+	//"fmt"
 )
 
 type Sprite struct {
 	Transform
 	ShaderOptions
-	Floating, Visible bool
+	Floating bool
+	Visibility
 }
 
 func (s *Sprite) Draw(c *Context) {
@@ -20,7 +22,7 @@ func (s *Sprite) Draw(c *Context) {
 	m := &Matrix{}
 	m.Concat(t.Matrix())
 	if !s.Floating {
-		m.Concat(c.Camera().RealMatrix())
+		m.Concat(c.Camera.RealMatrix())
 	}
 
 	// Drawing without shader.
@@ -41,11 +43,6 @@ func (s *Sprite) Draw(c *Context) {
 	c.DrawRectShader(w, h, s.Shader, opts)
 }
 
-// Check is sprite is visible.
-func (s *Sprite) IsVisible() bool {
-	return s.Visible
-}
-
 // Return the rectangle that contains the sprite.
 func (s *Sprite) Rectangle() Rectangle {
 	if s.Images[0] == nil {
@@ -54,12 +51,14 @@ func (s *Sprite) Rectangle() Rectangle {
 	
 	w, h := s.Images[0].Size()
 	t := s.Transform
-	t.RA.X *= Float(w)
-	t.RA.Y *= Float(h)
+	t.Around.X *= Float(w)
+	t.Around.Y *= Float(h)
 	
 	return Rectangle{t}
 }
 
+// Get triangles of the rectangle that contains the sprite
+// and has the same widght and height.
 func (s *Sprite) Triangles() Triangles {
 	return s.Rectangle().Triangles()
 }
