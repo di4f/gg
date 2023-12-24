@@ -7,6 +7,7 @@ import (
 	//"fmt"
 	"time"
 	"slices"
+	"sync"
 )
 
 // The type represents order of drawing.
@@ -202,6 +203,7 @@ func (e *Engine) AbsCursorPosition() Vector {
 }
 
 func (e *engine) Update() error {
+	var wg sync.WaitGroup
 	eng := (*Engine)(e)
 
 	e.dt = time.Since(e.lastTime).Seconds()
@@ -210,10 +212,16 @@ func (e *engine) Update() error {
 		if !ok {
 			continue
 		}
-		updater.Update(&Context{
-			Engine: eng,
-		})
+		wg.Add(1)
+		go func() {
+			updater.Update(&Context{
+				Engine: eng,
+			})
+			wg.Done()
+		}()
 	}
+	wg.Wait()
+
 	e.prevKeys = e.keys
 	e.keys = inpututil.
 		AppendPressedKeys(e.keys[:0])
@@ -270,17 +278,26 @@ func (e *engine) Update() error {
 		})
 		eng.cursorPos = realPos
 	}
+
+	// Providing the events to the objects.
+	// Maybe should think of the better way,
+	// but for it is simple enough.
 	for object := range e.Objects.KeyChan() {
 		eventer, ok := object.(Eventer)
 		if ok {
-			for _, event := range events {
-				eventer.Event(&Context{
-					Engine: eng,
-					Event: event,
-				})
-			}
+			wg.Add(1)
+			go func() {
+				defer wg.Done()
+				for _, event := range events {
+					eventer.Event(&Context{
+						Engine: eng,
+						Event: event,
+					})
+				}
+			}()
 		}
 	}
+	wg.Wait()
 
 	e.lastTime = time.Now()
 	return nil
