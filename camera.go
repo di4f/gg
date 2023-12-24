@@ -22,12 +22,11 @@ func (e *Engine) NewCamera() *Camera {
 // position, scale and rotation to apply
 // it to the objects to get the real
 // transform to display on the screen.
-// (Should implement buffering it so we do not
-//  need to calculate it each time for each object. )
 func (c *Camera)RealMatrix() Matrix {
-	/*if c.buf != nil {
+	// Bufferization
+	if c.buf != nil {
 		return *(c.buf)
-	}*/
+	}
 	g := &Matrix{}
 	g.Translate(-c.Position.X, -c.Position.Y)
 	g.Rotate(c.Rotation)

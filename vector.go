@@ -5,6 +5,10 @@ import (
 	"math"
 )
 
+var (
+	ZV = V2(0)
+)
+
 type Vector struct {
 	X, Y Float
 }
@@ -18,7 +22,7 @@ func V(x, y Float) Vector {
 	return Vector{x, y}
 }
 
-func V1(v Float) Vector {
+func V2(v Float) Vector {
 	return V(v, v)
 }
 

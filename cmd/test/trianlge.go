@@ -11,7 +11,7 @@ type Tri struct {
 func NewTri() *Tri {
 	ret := &Tri{}
 	ret.DrawablePolygon = &gg.DrawablePolygon{}
-	ret.Transform.Scale = gg.V(1, 1)
+	ret.Transform.Scale = gg.V2(1)
 
 	ret.Triangles = gg.Triangles{
 		gg.Triangle{

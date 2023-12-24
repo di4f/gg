@@ -22,11 +22,12 @@ type Transform struct {
 	Parent *Transform
 }
 
-// Returns empty Transform
-// with standard scaling. (1/1)
+// Returns the default Transform structure.
 func T() Transform {
 	ret := Transform{
+		// Rotate around
 		Scale: Vector{1, 1},
+		// Rotate around the center.
 		Around: V(.5, .5),
 	}
 	return ret

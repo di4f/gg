@@ -4,9 +4,9 @@ import (
 	//"github.com/hajimehoshi/ebiten/v2"
 )
 
-func keyDiff(s1, s2 []Key) []Key {
+func diffEm[V comparable](s1, s2 []V) []V {
     combinedSlice := append(s1, s2...)
-    dm := make(map[Key]int)
+    dm := make(map[V]int)
     for _, v := range combinedSlice {
         if _, ok := dm[v]; ok {
             // remove element later as it exist in both slice.
@@ -16,7 +16,7 @@ func keyDiff(s1, s2 []Key) []Key {
         // new entry, add in map!
         dm[v] = 1
     }
-    var retSlice []Key
+    var retSlice []V
     for k, v := range dm {
         if v == 1 {
             retSlice = append(retSlice, k)
@@ -44,7 +44,12 @@ type MouseButtonUp struct {
 }
 
 type MouseMove struct {
-	Delta Vector
+	// Real and absolute deltas.
+	Real, Abs Vector
+}
+
+type WheelChange struct {
+	Offset Vector
 }
 
 type EventChan chan any

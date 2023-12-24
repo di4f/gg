@@ -82,9 +82,9 @@ func (p *Player) Update(c *Context) {
 			}
 		case gg.KeyF:
 			if c.IsPressed(gg.KeyShift) {
-				cam.Scale = cam.Scale.Add(gg.V1(p.ScaleSpeed * dt))
+				cam.Scale = cam.Scale.Add(gg.V2(p.ScaleSpeed * dt))
 			} else {
-				cam.Scale = cam.Scale.Add(gg.V1(-p.ScaleSpeed * dt))
+				cam.Scale = cam.Scale.Add(gg.V2(-p.ScaleSpeed * dt))
 			}
 		case gg.KeyG:
 			if c.IsPressed(gg.KeyShift) {
@@ -124,6 +124,17 @@ func (p *Player) Event(c *gg.Context) {
 				p.Layer = HighestL
 			}
 		}
+	case *gg.MouseMove :
+		if !c.IsButtoned(gg.MouseButtonRight) {
+			break
+		}
+		pos := c.Camera.Position
+		c.Camera.Position = pos.Sub(ec.Abs)
+	case *gg.WheelChange :
+		c.Camera.Scale = c.Camera.Scale.Add(gg.V2(
+			ec.Offset.Y * c.DT() * p.ScaleSpeed,
+		))
 	}
+
 }
 

@@ -6,6 +6,7 @@ import (
 	"github.com/di4f/gods/maps"
 	//"fmt"
 	"time"
+	"slices"
 )
 
 // The type represents order of drawing.
@@ -53,8 +54,9 @@ type Engine struct {
 
 	// Temporary stuff 
 	keys, prevKeys []Key
-	cursorPos, prevCursorPos Vector
-	mouseButtons, prevMouseButtons []MouseButton
+	buttons MouseButtonMap
+	wheel Vector
+	cursorPos Vector
 	outerEvents, handleEvents EventChan
 }
 
@@ -63,6 +65,18 @@ type engine Engine
 // Get currently pressed keys.
 func (e *Engine) Keys() []Key {
 	return e.keys
+}
+
+// Returns currently pressed buttons.
+func (e *Engine) MouseButtons() []MouseButton {
+	ret := make([]MouseButton, len(e.buttons))
+	i := 0
+	for v := range e.buttons {
+		ret[i] = v
+		i++
+	}
+	slices.Sort(ret)
+	return ret
 }
 
 // Returns new empty Engine.
@@ -79,6 +93,7 @@ func NewEngine(
 	ret.outerEvents = make(EventChan)
 	ret.handleEvents = make(EventChan)
 	ret.Objects = maps.NewOrdered[Object, struct{}]()
+	ret.buttons = MouseButtonMap{}
 	return ret
 }
 
@@ -141,18 +156,94 @@ func (e *Engine) Del(b any) error {
 	return nil
 }
 
+var (
+	allButtons = []MouseButton{
+		MouseButton0,
+		MouseButton1,
+		MouseButton2,
+		MouseButton3,
+		MouseButton4,
+	}
+)
+
+func (e *Engine) IsPressed(k Key) bool {
+	keys := e.Keys()
+	for _, v := range keys {
+		if v == k {
+			return true
+		}
+	}
+
+	return false
+}
+
+func (e *Engine) IsButtoned(b MouseButton) bool {
+	_, ok := e.buttons[b]
+	return ok
+}
+
+func (e *Engine) Wheel() Vector {
+	return e.wheel
+}
+
+func (e *Engine) cursorPosition() Vector {
+	x, y := ebiten.CursorPosition()
+	return V(Float(x), Float(y))
+}
+
+func (e *Engine) CursorPosition() Vector {
+	return e.cursorPos
+}
+
+func (e *Engine) AbsCursorPosition() Vector {
+	m := &Matrix{}
+	m.Concat(e.Camera.AbsMatrix())
+	return e.CursorPosition().Apply(m)
+}
 
 func (e *engine) Update() error {
 	eng := (*Engine)(e)
 
+	e.dt = time.Since(e.lastTime).Seconds()
+	for object := range e.Objects.KeyChan() {
+		updater, ok := object.(Updater)
+		if !ok {
+			continue
+		}
+		updater.Update(&Context{
+			Engine: eng,
+		})
+	}
 	e.prevKeys = e.keys
 	e.keys = inpututil.
 		AppendPressedKeys(e.keys[:0])
 
 	events := []any{}
+	btns := e.buttons
+	for _, btn := range allButtons {
+		if inpututil.IsMouseButtonJustPressed(btn) {
+			btns[btn] = struct{}{}
+			events = append(events, &MouseButtonDown{
+				MouseButton: btn,
+			})
+		} else if inpututil.IsMouseButtonJustReleased(btn) {
+			delete(btns, btn)
+			events = append(events, &MouseButtonUp{
+				MouseButton: btn,
+			})
+		}
+	}
 
-	diff := keyDiff(e.prevKeys, e.keys)
-	for _, key := range diff {
+	x, y := ebiten.Wheel()
+	eng.wheel = V(x, y)
+	if !(eng.wheel.Eq(ZV)) {
+		events = append(events, &WheelChange{
+			Offset: eng.wheel,
+		})
+	}
+
+	keyDiff := diffEm(e.prevKeys, e.keys)
+	for _, key := range keyDiff {
 		var event any
 		if eng.IsPressed(key) {
 			event = &KeyDown{
@@ -166,7 +257,19 @@ func (e *engine) Update() error {
 		events = append(events, event)
 	}
 
-	e.dt = time.Since(e.lastTime).Seconds()
+	realPos := eng.cursorPosition()
+	if !realPos.Eq(eng.cursorPos) {
+		absM := eng.Camera.AbsMatrix()
+
+		absPrevPos :=eng.cursorPos.Apply(&absM)
+		absPos := realPos.Apply(&absM)
+
+		events = append(events, &MouseMove{
+			Real: realPos.Sub(eng.cursorPos),
+			Abs: absPos.Sub(absPrevPos),
+		})
+		eng.cursorPos = realPos
+	}
 	for object := range e.Objects.KeyChan() {
 		eventer, ok := object.(Eventer)
 		if ok {
@@ -177,16 +280,9 @@ func (e *engine) Update() error {
 				})
 			}
 		}
-		updater, ok := object.(Updater)
-		if !ok {
-			continue
-		}
-		updater.Update(&Context{
-			Engine: eng,
-		})
 	}
-	e.lastTime = time.Now()
 
+	e.lastTime = time.Now()
 	return nil
 }
 

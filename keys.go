@@ -156,13 +156,3 @@ const (
 	KeyRightBracket Key = Key(ebiten.KeyBracketRight)
 	KeyArrowUp           Key = Key(ebiten.KeyArrowUp)
 )
-func (e *Engine) IsPressed(k Key) bool {
-	keys := e.Keys()
-	for _, v := range keys {
-		if v == k {
-			return true
-		}
-	}
-
-	return false
-}
