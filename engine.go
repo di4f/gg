@@ -10,6 +10,9 @@ import (
 	"sync"
 )
 
+type GraphicsLibrary = ebiten.GraphicsLibrary
+type RunOptions = ebiten.RunGameOptions
+
 // The type represents order of drawing.
 // Higher values are drawn later.
 type Layer float64
@@ -20,6 +23,8 @@ func (l Layer) GetLayer() Layer {
 
 // Window configuration type.
 type WindowConfig struct {
+	DebugInfo ebiten.DebugInfo
+	Options *RunOptions
 	// The title of the window.
 	Title string
 	
@@ -66,6 +71,10 @@ type engine Engine
 // Get currently pressed keys.
 func (e *Engine) Keys() []Key {
 	return e.keys
+}
+
+func (e *Engine) GraphicsLibrary() GraphicsLibrary {
+	return e.wcfg.DebugInfo.GraphicsLibrary
 }
 
 // Returns currently pressed buttons.
@@ -351,6 +360,7 @@ func (e *Engine) DT() Float {
 }
 
 func (e *Engine) Run() error {
+	ebiten.ReadDebugInfo(&e.wcfg.DebugInfo)
 	ebiten.SetWindowTitle(e.wcfg.Title)
 	ebiten.SetWindowSize(e.wcfg.Width, e.wcfg.Height)
 	ebiten.SetWindowSizeLimits(1, 1, e.wcfg.Width, e.wcfg.Height)
@@ -359,6 +369,6 @@ func (e *Engine) Run() error {
 
 	e.lastTime = time.Now()
 	//fmt.Println(e.Objects)
-	return ebiten.RunGame((*engine)(e))
+	return ebiten.RunGameWithOptions((*engine)(e), e.wcfg.Options)
 }
 

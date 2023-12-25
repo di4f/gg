@@ -31,6 +31,10 @@ func NewPlayer() *Player {
 	return ret
 }
 
+func (p *Player) Start(c *Context) {
+	fmt.Println("library:", c.GraphicsLibrary())
+}
+
 // Custom drawing function.
 func (p *Player) Draw(c *Context) {
 	p.Sprite.Draw(c)

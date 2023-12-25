@@ -52,5 +52,8 @@ func main() {
 	e.Add(tri)
 	fmt.Println(rect.GetLayer(), player.GetLayer())
 
-	e.Run()
+	err = e.Run()
+	if err != nil {
+		panic(err)
+	}
 }
