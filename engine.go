@@ -358,6 +358,13 @@ func (e *engine) Layout(ow, oh int) (int, int) {
 func (e *Engine) DT() Float {
 	return e.dt
 }
+func (e *Engine) FPS() float64 {
+	return ebiten.ActualFPS()
+}
+
+func (e *Engine) TPS() float64 {
+	return ebiten.ActualTPS()
+}
 
 func (e *Engine) Run() error {
 	ebiten.ReadDebugInfo(&e.wcfg.DebugInfo)

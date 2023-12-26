@@ -20,7 +20,8 @@ func (s *Sprite) Draw(c *Context) {
 	
 	t := s.Rectangle().Transform
 	m := &Matrix{}
-	m.Concat(t.Matrix())
+	tm := t.Matrix()
+	m.Concat(*tm)
 	if !s.Floating {
 		m.Concat(c.Camera.RealMatrix())
 	}

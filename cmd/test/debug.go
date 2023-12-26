@@ -15,6 +15,18 @@ type Debug struct {
 func (d *Debug) Draw(c *Context) {
 	e := c.Engine
 	keyStrs := []string{}
+	keyStrs = append(keyStrs, fmt.Sprintf(
+		"tps: %d", int(c.TPS()),
+	))
+	keyStrs = append(keyStrs, fmt.Sprintf(
+		"fps: %d", int(c.FPS()),
+	))
+	keyStrs = append(keyStrs, fmt.Sprintf(
+		"absPlayerPos: %v", player.Position,
+	))
+	keyStrs = append(keyStrs, fmt.Sprintf(
+		"absTriPos: %v", tri.AbsPosition(),
+	))
 
 	keys := []string{}
 	for _, k := range e.Keys() {
@@ -30,7 +42,6 @@ func (d *Debug) Draw(c *Context) {
 	keyStrs = append(keyStrs, fmt.Sprintf(
 		"wheel: %v", c.Wheel(),
 	))
-
 	/*if rectMove.ContainsPoint(e.AbsCursorPosition()) {
 		keyStrs = append(keyStrs, "contains cursor")
 	}

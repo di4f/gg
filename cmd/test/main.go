@@ -42,8 +42,8 @@ func main() {
 		log.Fatal(err)
 	}
 
-	player = NewPlayer()
 	rect = NewRect()
+	player = NewPlayer()
 	tri = NewTri()
 
 	e.Add(&Debug{})

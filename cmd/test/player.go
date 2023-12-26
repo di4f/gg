@@ -2,7 +2,7 @@ package main
 
 import (
 	//"math/rand"
-	//"fmt"
+	"fmt"
 )
 
 import "github.com/di4f/gg"
@@ -17,9 +17,11 @@ type Player struct {
 func NewPlayer() *Player {
 	ret := &Player{}
 	ret.Transform = gg.T()
+	fmt.Println("transform:", ret.Transform)
+	//ret.Parent = rect
 	ret.Scale = gg.V(5, 5)
 	// Around center.
-	ret.Around = gg.V(.5, .5)
+	ret.Around = gg.V2(.5)
 	ret.MoveSpeed =  90.
 	ret.ScaleSpeed = .2
 

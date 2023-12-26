@@ -4,13 +4,13 @@ import "github.com/di4f/gg"
 //import "fmt"
 
 type Tri struct {
-	*gg.DrawablePolygon
+	gg.DrawablePolygon
 	gg.Layer
 }
 
 func NewTri() *Tri {
 	ret := &Tri{}
-	ret.DrawablePolygon = &gg.DrawablePolygon{}
+	ret.Parent = player
 	ret.Transform.Scale = gg.V2(1)
 
 	ret.Triangles = gg.Triangles{
@@ -37,5 +37,22 @@ func (t *Tri) Update(c *Context) {
 		t.Color = gg.Rgba(0, 1, 0, 1)
 	} else {
 		t.Color = gg.Rgba(1, 0, 1, 1)
+	}
+
+	d := +1.
+	if c.IsPressed(gg.KeyShift) {
+		d = -1.
+	}
+	if c.IsPressed(gg.KeyM) {
+		absPos := tri.AbsPosition()
+		tri.SetAbsPosition(
+			absPos.Add(gg.V(0, 100 * c.DT() * d)),
+		)
+	}
+	if c.IsPressed(gg.KeyN) {
+		absPos := tri.AbsPosition()
+		tri.SetAbsPosition(
+			absPos.Add(gg.V(100 * c.DT() * d, 0)),
+		)
 	}
 }

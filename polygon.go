@@ -3,10 +3,6 @@ package gg
 import (
 )
 
-type PolygonTriangle struct {
-	T, S int
-}
-
 // Grouped triangles type.
 type Polygon struct {
 	Transform
@@ -27,9 +23,7 @@ type DrawablePolygon struct {
 }
 
 func (p *Polygon) MakeTriangles() Triangles {
-	mv := p.Matrix()
-	m := &mv
-	
+	m := p.Matrix()
 	ret := make(Triangles, len(p.Triangles))
 	for i, t := range p.Triangles {
 		ret[i] = Triangle{

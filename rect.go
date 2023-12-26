@@ -29,10 +29,10 @@ type DrawableRectangle struct {
 // Return points of vertices of the rectangle.
 func (r Rectangle) Vertices() Points {
 	m := r.Matrix()
-	p1 := V(0, 0).Apply(&m)
-	p2 := V(1, 0).Apply(&m)
-	p3 := V(1, 1).Apply(&m)
-	p4 := V(0, 1).Apply(&m)
+	p1 := V(0, 0).Apply(m)
+	p2 := V(1, 0).Apply(m)
+	p3 := V(1, 1).Apply(m)
+	p4 := V(0, 1).Apply(m)
 	return Points{p1, p2, p3, p4}
 }
 
@@ -81,7 +81,7 @@ func (r *DrawableRectangle) Draw(c *Context) {
 		
 		
 		opts := &ebiten.DrawImageOptions{
-			GeoM: m,
+			GeoM: *m,
 		}
 		c.DrawImage(img, opts)
 		return
@@ -93,21 +93,13 @@ func (r *DrawableRectangle) Draw(c *Context) {
 	if r.Images[0] == nil {
 		r.Images[0] = NewImage(1, 1)
 		r.Images[0].Set(0, 0, r.Color)
-		//did = true
 	} 
 	
 	w, h := r.Images[0].Size()
-	/*if !did {
-		t.S.X /= Float(w)
-		t.S.Y /= Float(h)
-		
-		t.S.X *= r.W
-		t.S.Y *= r.H
-	}*/
 	
 	// Drawing with shader.
 	opts := &ebiten.DrawRectShaderOptions{
-		GeoM: m,
+		GeoM: *m,
 		Images: r.Images,
 		Uniforms: r.Uniforms,
 	}

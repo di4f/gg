@@ -5,6 +5,10 @@ import (
 	//"math"
 )
 
+type Transformer interface {
+	GetTransform() *Transform
+}
+
 // The structure represents basic transformation
 // features: positioning, rotating and scaling.
 type Transform struct {
@@ -16,10 +20,13 @@ type Transform struct {
 	// The not scaled offset vector from upper left corner
 	// which the object should be rotated around.
 	Around Vector
-	// Needs to be implemented.
-	// Makes transform depending on the other one.
-	// Is the root one if Parent == nil
-	Parent *Transform
+	// If is not nil then the upper values will be relational to
+	// the parent ones.
+	Parent Transformer
+}
+
+func (t *Transform) GetTransform() *Transform {
+	return t
 }
 
 // Returns the default Transform structure.
@@ -47,9 +54,22 @@ func (t Transform) ScaledToY(y Float) Transform {
 	return t
 }
 
+func (t *Transform) SetAbsPosition(absPosition Vector) {
+	m := t.Matrix()
+	m.Invert()
+	t.Position = absPosition.Apply(m)
+}
+
+func (t *Transform) AbsPosition() Vector {
+	return t.Position.Apply(t.Matrix())
+}
+
+func (t *Transform) Connect(p Transformer) {
+}
+
 // Returns the GeoM with corresponding
 // to the transfrom transformation.
-func (t Transform)Matrix() Matrix {
+func (t *Transform)Matrix() *Matrix {
 	g := &Matrix{}
 
 	// Scale first.
@@ -65,6 +85,11 @@ func (t Transform)Matrix() Matrix {
 	// And finally move to the absolute position.
 	g.Translate(t.Position.X, t.Position.Y)
 
-	return *g
+	if t.Parent != nil {
+		m := t.Parent.GetTransform().Matrix()
+		g.Concat(*m)
+	}
+
+	return g
 }
 
