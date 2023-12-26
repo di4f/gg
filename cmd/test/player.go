@@ -136,7 +136,7 @@ func (p *Player) Event(c *gg.Context) {
 		c.Camera.Position = pos.Sub(ec.Abs)
 	case *gg.WheelChange :
 		c.Camera.Scale = c.Camera.Scale.Add(gg.V2(
-			ec.Offset.Y * c.DT() * p.ScaleSpeed,
+			ec.Offset.Y * c.DT() * p.ScaleSpeed * 20,
 		))
 	}
 
