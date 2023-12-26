@@ -2,7 +2,7 @@ package main
 
 import (
 	//"math/rand"
-	"fmt"
+	//"fmt"
 )
 
 import "github.com/di4f/gg"
@@ -32,7 +32,6 @@ func NewPlayer() *Player {
 }
 
 func (p *Player) Start(c *Context) {
-	fmt.Println("library:", c.GraphicsLibrary())
 }
 
 // Custom drawing function.
@@ -117,7 +116,6 @@ func (p *Player) Update(c *Context) {
 }
 
 func (p *Player) Event(c *gg.Context) {
-	fmt.Println("event:", c.Event)
 	switch ec := c.Event.(type) {
 	case *gg.KeyDown:
 		switch {
