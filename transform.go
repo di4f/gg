@@ -60,11 +60,43 @@ func (t *Transform) SetAbsPosition(absPosition Vector) {
 	t.Position = absPosition.Apply(m)
 }
 
+// Get the absolute representation of the transform.
+func (t *Transform) Abs() Transform {
+	m := t.Matrix()
+	ret := Transform{}
+	ret.Position = t.Position.Apply(m)
+	ret.Rotation = t.AbsRotation()
+	return ret
+}
+
 func (t *Transform) AbsPosition() Vector {
 	return t.Position.Apply(t.Matrix())
 }
 
+func (t *Transform) AbsScale() Vector {
+	return V2(0)
+}
+
+func (t *Transform) AbsRotation() Float {
+	if t.Parent == nil {
+		return t.Rotation
+	}
+	return t.Rotation + t.Parent.GetTransform().AbsRotation()
+}
+
+func (t *Transform) Connected() bool {
+	return t.Parent != nil
+}
+
 func (t *Transform) Connect(p Transformer) {
+}
+
+func (t *Transform) Disconnect() {
+	if t.Parent == nil {
+		return
+	}
+	*t = t.Abs()
+	t.Parent = nil
 }
 
 // Returns the GeoM with corresponding

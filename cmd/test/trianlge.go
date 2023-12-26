@@ -15,14 +15,9 @@ func NewTri() *Tri {
 
 	ret.Triangles = gg.Triangles{
 		gg.Triangle{
-			gg.V(0, 0),
-			gg.V(100, 100),
-			gg.V(0, -50),
-		},
-		gg.Triangle{
-			gg.V(0, 0),
-			gg.V(-100, -100),
-			gg.V(0, 50),
+			gg.V(0, 10),
+			gg.V(100, 0),
+			gg.V(0, -10),
 		},
 	}
 	ret.Color = gg.Color{gg.MaxColorV, gg.MaxColorV, 0, gg.MaxColorV}

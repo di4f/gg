@@ -27,6 +27,9 @@ func (d *Debug) Draw(c *Context) {
 	keyStrs = append(keyStrs, fmt.Sprintf(
 		"absTriPos: %v", tri.AbsPosition(),
 	))
+	keyStrs = append(keyStrs, fmt.Sprintf(
+		"absTriRot: %v", gg.Degree(tri.AbsRotation()),
+	))
 
 	keys := []string{}
 	for _, k := range e.Keys() {

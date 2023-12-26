@@ -15,6 +15,10 @@ const (
 	//PiRad = Pi * Rad
 )
 
+func Degree(f Float) Float {
+	return (f/(2*Pi))*360
+}
+
 // Returns square of the value.
 func Sqr(v Float) Float {
 	return v * v
