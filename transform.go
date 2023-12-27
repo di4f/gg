@@ -55,26 +55,41 @@ func (t Transform) ScaledToY(y Float) Transform {
 }
 
 func (t *Transform) SetAbsPosition(absPosition Vector) {
-	m := t.Matrix()
+	if t.Parent == nil {
+		t.Position = absPosition
+		return
+	}
+	m := t.ParentMatrix()
 	m.Invert()
 	t.Position = absPosition.Apply(m)
 }
 
 // Get the absolute representation of the transform.
 func (t *Transform) Abs() Transform {
-	m := t.Matrix()
-	ret := Transform{}
-	ret.Position = t.Position.Apply(m)
+	if t.Parent == nil {
+		return *t
+	}
+
+	ret := T()
+	ret.Position = t.AbsPosition()
 	ret.Rotation = t.AbsRotation()
+	ret.Scale = t.AbsScale()
+
 	return ret
 }
 
 func (t *Transform) AbsPosition() Vector {
-	return t.Position.Apply(t.Matrix())
+	if t.Parent == nil {
+		return t.Position
+	}
+	return t.Position.Apply(t.ParentMatrix())
 }
 
 func (t *Transform) AbsScale() Vector {
-	return V2(0)
+	if t.Parent == nil {
+		return t.Scale
+	}
+	return V2(1)
 }
 
 func (t *Transform) AbsRotation() Float {
@@ -84,11 +99,23 @@ func (t *Transform) AbsRotation() Float {
 	return t.Rotation + t.Parent.GetTransform().AbsRotation()
 }
 
+func (t *Transform) SetAbsRotation(rot Float) {
+	if t.Parent == nil {
+		t.Rotation = rot
+	}
+	t.Rotation -= t.Parent.GetTransform().AbsRotation()
+}
+
 func (t *Transform) Connected() bool {
 	return t.Parent != nil
 }
 
-func (t *Transform) Connect(p Transformer) {
+func (t *Transform) Connect(parent Transformer) {
+	absPosition := t.AbsPosition()
+	absRotation := t.AbsRotation()
+	t.Parent = parent
+	t.SetAbsPosition(absPosition)
+	t.SetAbsRotation(absRotation)
 }
 
 func (t *Transform) Disconnect() {
@@ -96,7 +123,22 @@ func (t *Transform) Disconnect() {
 		return
 	}
 	*t = t.Abs()
-	t.Parent = nil
+}
+
+func (t *Transform) ParentMatrix() *Matrix {
+	g := &Matrix{}
+	if t.Parent == nil {
+		return g
+	}
+
+	p := t.Parent.GetTransform()
+	g = p.ParentMatrix()
+
+	g.Scale(p.Scale.X, p.Scale.Y)
+	g.Rotate(p.Rotation)
+	g.Translate(p.Position.X, p.Position.Y)
+
+	return g
 }
 
 // Returns the GeoM with corresponding
@@ -117,10 +159,8 @@ func (t *Transform)Matrix() *Matrix {
 	// And finally move to the absolute position.
 	g.Translate(t.Position.X, t.Position.Y)
 
-	if t.Parent != nil {
-		m := t.Parent.GetTransform().Matrix()
-		g.Concat(*m)
-	}
+	m := t.ParentMatrix()
+	g.Concat(*m)
 
 	return g
 }

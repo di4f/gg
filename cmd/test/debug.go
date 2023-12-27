@@ -22,7 +22,14 @@ func (d *Debug) Draw(c *Context) {
 		"fps: %d", int(c.FPS()),
 	))
 	keyStrs = append(keyStrs, fmt.Sprintf(
-		"absPlayerPos: %v", player.Position,
+		"relPlayerPos: %v", player.Position,
+	))
+	keyStrs = append(keyStrs, fmt.Sprintf(
+		"absPlayerPos: %v", player.AbsPosition(),
+	))
+
+	keyStrs = append(keyStrs, fmt.Sprintf(
+		"relTriPos: %v", tri.Position,
 	))
 	keyStrs = append(keyStrs, fmt.Sprintf(
 		"absTriPos: %v", tri.AbsPosition(),

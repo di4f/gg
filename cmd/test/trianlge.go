@@ -1,7 +1,7 @@
 package main
 
 import "github.com/di4f/gg"
-//import "fmt"
+import "fmt"
 
 type Tri struct {
 	gg.DrawablePolygon
@@ -20,7 +20,7 @@ func NewTri() *Tri {
 			gg.V(0, -10),
 		},
 	}
-	ret.Color = gg.Color{gg.MaxColorV, gg.MaxColorV, 0, gg.MaxColorV}
+	ret.Color = gg.Rgba(1, 1, 0, 1)
 	ret.Visible = true
 	ret.Layer = TriangleL
 
@@ -49,5 +49,21 @@ func (t *Tri) Update(c *Context) {
 		tri.SetAbsPosition(
 			absPos.Add(gg.V(100 * c.DT() * d, 0)),
 		)
+	}
+}
+
+func (t *Tri) Event(c *Context) {
+	switch e := c.Event.(type) {
+	case *gg.KeyDown :
+		if e.Key != gg.Key1 {
+			break
+		}
+		if t.Connected() {
+			fmt.Println("disconnecting:", tri.Transform)
+			t.Disconnect()
+		} else {
+			t.Connect(player)
+			fmt.Println("connecting:", tri.Transform)
+		}
 	}
 }

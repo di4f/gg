@@ -19,7 +19,7 @@ func NewPlayer() *Player {
 	ret.Transform = gg.T()
 	fmt.Println("transform:", ret.Transform)
 	//ret.Parent = rect
-	ret.Scale = gg.V(5, 5)
+	ret.Scale = gg.V2(1)
 	// Around center.
 	ret.Around = gg.V2(.5)
 	ret.MoveSpeed =  90.
@@ -136,7 +136,7 @@ func (p *Player) Event(c *gg.Context) {
 		c.Camera.Position = pos.Sub(ec.Abs)
 	case *gg.WheelChange :
 		c.Camera.Scale = c.Camera.Scale.Add(gg.V2(
-			ec.Offset.Y * c.DT() * p.ScaleSpeed * 20,
+			ec.Offset.Y * c.DT() * p.ScaleSpeed * 40,
 		))
 	}
 
