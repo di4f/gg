@@ -10,7 +10,6 @@ type Tri struct {
 
 func NewTri() *Tri {
 	ret := &Tri{}
-	ret.Parent = player
 	ret.Transform.Scale = gg.V2(1)
 
 	ret.Triangles = gg.Triangles{
@@ -23,6 +22,7 @@ func NewTri() *Tri {
 	ret.Color = gg.Rgba(1, 1, 0, 1)
 	ret.Visible = true
 	ret.Layer = TriangleL
+	ret.Connect(player)
 
 	return ret
 }

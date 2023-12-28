@@ -56,9 +56,12 @@ func (p *Player) Update(c *Context) {
 	cam := c.Camera
 	keys := c.Keys()
 
+	shift := c.IsPressed(gg.KeyShift)
 	//p.Uniforms["Random"] = any(rand.Float32())
 	for _, v := range keys {
 		switch v {
+		case gg.KeyQ :
+			p.Scale = p.Scale.Add(gg.V(p.ScaleSpeed * dt, 0))
 		case gg.KeyArrowUp:
 			cam.Position.Y += p.MoveSpeed * dt
 		case gg.KeyArrowLeft:
@@ -80,31 +83,31 @@ func (p *Player) Update(c *Context) {
 		case gg.KeyT:
 			cam.Rotation -= gg.Pi * p.ScaleSpeed * dt
 		case gg.KeyRightBracket:
-			if c.IsPressed(gg.KeyShift) {
+			if shift {
 				p.Rotation -= gg.Pi * 0.3 * dt
 			} else {
 				p.Rotation += gg.Pi * 0.3 * dt
 			}
 		case gg.KeyF:
-			if c.IsPressed(gg.KeyShift) {
+			if shift {
 				cam.Scale = cam.Scale.Add(gg.V2(p.ScaleSpeed * dt))
 			} else {
 				cam.Scale = cam.Scale.Add(gg.V2(-p.ScaleSpeed * dt))
 			}
 		case gg.KeyG:
-			if c.IsPressed(gg.KeyShift) {
+			if shift {
 				cam.Scale.Y -= gg.Pi * p.ScaleSpeed * dt
 			} else {
 				cam.Scale.Y += gg.Pi * p.ScaleSpeed * dt
 			}
 		case gg.KeyV:
-			if c.IsPressed(gg.KeyShift) {
+			if shift {
 				tri.Rotation -= gg.Pi * 0.3 * dt
 			} else {
 				tri.Rotation += gg.Pi * 0.3 * dt
 			}
 		case gg.KeyLeftBracket:
-			if c.IsPressed(gg.KeyShift) {
+			if shift {
 				rect.Rotation -= gg.Pi * 0.3 * dt
 			} else {
 				rect.Rotation += gg.Pi * 0.3 * dt
